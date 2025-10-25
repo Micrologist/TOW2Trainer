@@ -103,6 +103,9 @@ namespace TOW2Trainer.Logic
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> PlayerMovement -> CheatFlying
                 new MemoryWatcher<byte>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_MOVEMENT, 0x5AD)) { Name = "cheatFlying" },
 
+                // LocalPlayer -> PlayerController -> PlayerCharacter -> PlayerMovement -> CheatFlying
+                new MemoryWatcher<byte>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_MOVEMENT, 0x1238)) { Name = "jumpApex" },
+
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> EnableCollision
                 new MemoryWatcher<byte>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, 0xBD)) { Name = "collisionEnabled" },
 

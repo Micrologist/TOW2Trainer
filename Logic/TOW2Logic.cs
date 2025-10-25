@@ -140,6 +140,7 @@ namespace TOW2Trainer.Logic
             mem.Write("flySpeed", flySpeed);
             mem.Write("acceleration", acceleration);
             mem.Write("collisionEnabled", collisionEnabled);
+            mem.Write("jumpApex", float.MinValue);
             SetGod(godMode);
         }
 
