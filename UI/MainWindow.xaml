@@ -35,7 +35,7 @@
                    Source="/Media/mm.ico" 
                    Width="20" Height="20" 
                    Margin="5,0,0,0"
-                   VerticalAlignment="Center" Panel.ZIndex="1"/>
+                   VerticalAlignment="Center" Panel.ZIndex="-999"/>
 
 			<!-- Window Title -->
 			<TextBlock Grid.Column="1" 

@@ -82,9 +82,9 @@ namespace TOW2Trainer.Logic
 
             Watchers = [
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> PlayerCapsule -> Position
-                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x1A0)) { Name = "xPos" },
-                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x1A8)) { Name = "yPos" },
-                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x1B0)) { Name = "zPos" },
+                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x260)) { Name = "xPos" },
+                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x268)) { Name = "yPos" },
+                new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_CAPSULE, 0x270)) { Name = "zPos" },
 
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> PlayerMovement -> Velocity
                 new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, OFFSET_MOVEMENT, 0x130)) { Name = "xVel" },
