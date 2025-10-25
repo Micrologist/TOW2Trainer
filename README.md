@@ -13,5 +13,6 @@ Game trainer for [The Outer Worlds 2](https://https://www.pcgamingwiki.com/wiki/
 ## Download
 Click [here](https://github.com/Micrologist/TOW2Trainer/releases/latest/download/TOW2Trainer.exe) to download the latest version.
 
-## Troubleshooting
-This application requires [.NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0).
+## Requirements
+
+- [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (or SDK if you plan to build from source)
