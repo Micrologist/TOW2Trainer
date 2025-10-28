@@ -31,6 +31,7 @@ namespace TOW2Trainer.UI
         public MainWindow()
         {
             InitializeComponent();
+            this.Topmost = true;
             InitializeKeyboardHook();
             trainer = new Logic.TOW2Logic();
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = new TimeSpan(10 * 10000) };
