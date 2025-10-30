@@ -12,7 +12,7 @@ namespace TOW2Trainer.UI
 {
     public partial class MainWindow : Window
     {
-        private readonly Logic.TOW2Logic trainer;
+        private readonly Logic.TOW2Logic Logic;
         private GlobalKeyboardHook kbHook;
         private readonly float[] FlySpeedMults = new float[4] { 1f, 2f, 4f, 0.5f };
         private bool shouldAcceptKeystrokes = true;
@@ -22,7 +22,8 @@ namespace TOW2Trainer.UI
             { "noclip", Key.F2 },
             { "speed", Key.F3 },
             { "store", Key.F6 },
-            { "teleport", Key.F7 }
+            { "teleport", Key.F7 },
+            { "volumes", Key.F10 }
         };
         private Dictionary<string, Key> keybinds = [];
         private Dictionary<Key, Action> keybindActions;
@@ -33,10 +34,15 @@ namespace TOW2Trainer.UI
             InitializeComponent();
             this.Topmost = true;
             InitializeKeyboardHook();
-            trainer = new Logic.TOW2Logic();
+            Logic = new Logic.TOW2Logic();
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = new TimeSpan(10 * 10000) };
             timer.Tick += UIUpdateTick;
             timer.Start();
+
+            if(!File.Exists("ArkansasVolumeVisualizer.dll"))
+            {
+                toggleVolumesBtn.Visibility = Visibility.Hidden;
+            }
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -50,7 +56,7 @@ namespace TOW2Trainer.UI
 
         private void closeBtn_Click(object sender, RoutedEventArgs e)
         {
-            trainer.ShouldAbort = true;
+            Logic.ShouldAbort = true;
             kbHook.unhook();
             Application.Current.Shutdown();
         }
@@ -89,6 +95,11 @@ namespace TOW2Trainer.UI
                         keybindActions.Add(keybind.Value, () => teleBtn_Click(null, null));
                         SetKeybindText(teleBtn, keybind.Value);
                         keybindStore += "teleport,";
+                        break;
+                    case "volumes":
+                        keybindActions.Add(keybind.Value, () => volumesBtn_Click(null, null));
+                        SetKeybindText(toggleVolumesBtn, keybind.Value);
+                        keybindStore += "volumes,";
                         break;
                     default:
                         break;
@@ -155,20 +166,20 @@ namespace TOW2Trainer.UI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            trainer.ShouldAbort = true;
+            Logic.ShouldAbort = true;
             kbHook.unhook();
         }
 
         private void UIUpdateTick(object sender, EventArgs e)
         {
             positionBlock.Text =
-                  (trainer.XPos / 100).ToString("0.00") + "\n"
-                + (trainer.YPos / 100).ToString("0.00") + "\n"
-                + (trainer.ZPos / 100).ToString("0.00");
-            speedBlock.Text = trainer.Vel.ToString("0.00") + " m/s";
-            SetLabel(trainer.ShouldGod, godLabel);
-            SetLabel(trainer.ShouldNoclip, noclipLabel);
-            flySpeedLabel.Content = trainer.FlySpeedMult.ToString("0.0") + "x";
+                  (Logic.XPos / 100).ToString("0.00") + "\n"
+                + (Logic.YPos / 100).ToString("0.00") + "\n"
+                + (Logic.ZPos / 100).ToString("0.00");
+            speedBlock.Text = Logic.Vel.ToString("0.00") + " m/s";
+            SetLabel(Logic.ShouldGod, godLabel);
+            SetLabel(Logic.ShouldNoclip, noclipLabel);
+            flySpeedLabel.Content = Logic.FlySpeedMult.ToString("0.0") + "x";
         }
 
         private void SetLabel(bool state, System.Windows.Controls.Label label)
@@ -190,36 +201,54 @@ namespace TOW2Trainer.UI
 
         private void teleBtn_Click(object sender, RoutedEventArgs e)
         {
-            trainer.ShouldTeleport = true;
+            Logic.ShouldTeleport = true;
         }
 
         private void saveBtn_Click(object sender, RoutedEventArgs e)
         {
-            trainer.ShouldStore = true;
+            Logic.ShouldStore = true;
         }
 
         private void noclipBtn_Click(object sender, RoutedEventArgs e)
         {
-            trainer.ShouldNoclip = !trainer.ShouldNoclip;
+            Logic.ShouldNoclip = !Logic.ShouldNoclip;
         }
 
         private void godBtn_Click(object sender, RoutedEventArgs e)
         {
-            trainer.ShouldGod = !trainer.ShouldGod;
+            Logic.ShouldGod = !Logic.ShouldGod;
         }
 
         private void flySpeedBtn_Click(object sender, RoutedEventArgs e)
         {
-            float old = trainer.FlySpeedMult;
-            trainer.FlySpeedMult = FlySpeedMults[(Array.IndexOf(FlySpeedMults, old) + 1) % FlySpeedMults.Length];
+            float old = Logic.FlySpeedMult;
+            Logic.FlySpeedMult = FlySpeedMults[(Array.IndexOf(FlySpeedMults, old) + 1) % FlySpeedMults.Length];
         }
+
+        private void volumesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(toggleVolumesBtn.Visibility != Visibility.Hidden)
+                Logic.ToggleVolumes();
+        }
+
 
         private void editKeybindBtn_Click(object sender, RoutedEventArgs e)
         {
+            var oldTopmost = this.Topmost;
+            this.Topmost = false;
             shouldAcceptKeystrokes = false;
+
             KeybindWindow kbWindow = new KeybindWindow(this, keybinds);
             _ = kbWindow.ShowDialog();
+
+            this.Topmost = oldTopmost;
             shouldAcceptKeystrokes = true;
+        }
+
+        private void topmostBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Topmost = !this.Topmost;
+            topmostBtn.Content = this.Topmost ? "don't stay on top" : "stay on top";
         }
     }
 }

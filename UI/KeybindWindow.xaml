@@ -5,18 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TOW2Trainer.UI"
         mc:Ignorable="d"
-        Title="The Outer Worlds 2 Trainer - Edit Keybinds" Height="274.667" Width="403.333" ResizeMode="CanMinimize">
+        Title="The Outer Worlds 2 Trainer - Edit Keybinds" Height="310" Width="402" ResizeMode="CanMinimize">
 	<Grid Background="#FF292929">
-		<Label x:Name="godLabel" Content="God" HorizontalAlignment="Left" Height="35" Margin="10,10,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
-		<Label x:Name="noclipLabel" Content="NoClip" HorizontalAlignment="Left" Height="35" Margin="10,45,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
-		<Label x:Name="speedLabel" Content="Fly Speed" HorizontalAlignment="Left" Height="35" Margin="10,80,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
-		<Label x:Name="storeLabel" Content="Store Position" HorizontalAlignment="Left" Height="35" Margin="10,115,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
-		<Label x:Name="teleportLabel" Content="Teleport" HorizontalAlignment="Left" Height="35" Margin="10,150,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="godLabel" Content="God" HorizontalAlignment="Left" Height="37" Margin="10,10,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="noclipLabel" Content="NoClip" HorizontalAlignment="Left" Height="37" Margin="10,45,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="speedLabel" Content="Fly Speed" HorizontalAlignment="Left" Height="37" Margin="10,80,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="storeLabel" Content="Store Position" HorizontalAlignment="Left" Height="37" Margin="10,115,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="teleportLabel" Content="Teleport&#xD;&#xA;" HorizontalAlignment="Left" Height="37" Margin="10,150,0,0" VerticalAlignment="Top" Width="145" FontSize="20" Foreground="White"/>
+		<Label x:Name="volumesLabel" Content="Toggle Volumes" HorizontalAlignment="Left" Height="37" Margin="10,185,0,0" VerticalAlignment="Top" Width="164" FontSize="20" Foreground="White"/>
 		<Button x:Name="god" Content="F1" HorizontalAlignment="Left" Height="27" Margin="176,16,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click" />
 		<Button x:Name="noclip" Content="F2" HorizontalAlignment="Left" Height="27" Margin="176,51,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click"  />
 		<Button x:Name="speed" Content="F3" HorizontalAlignment="Left" Height="27" Margin="176,86,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click"  />
 		<Button x:Name="store" Content="F6" HorizontalAlignment="Left" Height="27" Margin="176,121,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click"  />
 		<Button x:Name="teleport" Content="F7" HorizontalAlignment="Left" Height="27" Margin="176,156,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click"  />
-		<Button x:Name="SaveBindsBtn" Content="Save Keybinds" HorizontalAlignment="Left" Height="27" Margin="10,197,0,0" VerticalAlignment="Top" Width="366" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="SaveBindsBtn_Click" />
+		<Button x:Name="volumes" Content="F10" HorizontalAlignment="Left" Height="27" Margin="176,191,0,0" VerticalAlignment="Top" Width="200" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="KeyBindBtn_Click"  />
+		<Button x:Name="SaveBindsBtn" Content="Save Keybinds" HorizontalAlignment="Left" Height="27" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="366" FontSize="16" Background="#FF666666" Foreground="White" BorderBrush="#FF040404" Click="SaveBindsBtn_Click" />
 	</Grid>
 </Window>

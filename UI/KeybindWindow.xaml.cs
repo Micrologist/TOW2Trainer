@@ -28,7 +28,8 @@ namespace TOW2Trainer.UI
                 { "noclip", noclip },
                 { "speed", speed },
                 { "store", store },
-                { "teleport", teleport }
+                { "teleport", teleport },
+                { "volumes", volumes }
             };
 
             foreach (KeyValuePair<string, Key> kvp in keybinds)

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using TOW2Trainer.MemUtil;
 
@@ -112,6 +113,9 @@ namespace TOW2Trainer.Logic
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> CanBeDamaged
                 new MemoryWatcher<byte>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER, 0xBA)) { Name = "canBeDamaged" },
 
+                // LocalPlayer -> PlayerController -> PlayerCharacter
+                new MemoryWatcher<IntPtr>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, OFFSET_CHARACTER)) { Name = "playerCharacter" },
+
                 // LocalPlayer -> PlayerController -> ControlRotation
                 new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, 0x3A0)) { Name = "vLook" },
                 new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, 0x3A8)) { Name = "hLook" },
@@ -166,6 +170,30 @@ namespace TOW2Trainer.Logic
         public void Write(string name, byte bValue)
         {
             Write(name, new byte[] { bValue });
+        }
+
+        public void SetVolumesVisible(bool newVisbilityState)
+        {
+            if (!IsHooked()) return;
+
+            try
+            {
+                var moduleName = "ArkansasVolumeVisualizer.dll";
+                var exportThunk = "RefreshVolumes_Thread";
+
+                string dllPath = Path.Combine(
+                    AppContext.BaseDirectory,
+                    moduleName);
+
+                var (hProc, remoteBase) = Remote.EnsureInjected(proc, dllPath, moduleName);
+                var remoteThunk = Remote.GetRemoteExportByRva(remoteBase, dllPath, exportThunk);
+
+                Remote.CallRemoteBool(hProc, remoteThunk, newVisbilityState);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private nint GetLocalPlayerPtr()

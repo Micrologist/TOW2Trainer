@@ -12,6 +12,8 @@ namespace TOW2Trainer.Logic
         public bool ShouldAmmo { get; set; }
         public bool ShouldStore { get; set; }
         public bool ShouldTeleport { get; set; }
+        
+
         public float FlySpeedMult { get; set; } = 1f;
 
         public double XPos { get; private set; }
@@ -22,6 +24,10 @@ namespace TOW2Trainer.Logic
         private readonly TOW2Memory mem;
 
         private readonly double[] storedPos = new double[5];
+
+        private bool showingVolumes;
+
+        private IntPtr cachedPlayerPtr;
 
         public TOW2Logic()
         {
@@ -38,6 +44,12 @@ namespace TOW2Trainer.Logic
                 {
                     UpdateUIValues();
                     SetGameState();
+
+                    if ((IntPtr)mem.Watchers["playerCharacter"].Current != cachedPlayerPtr)
+                    {
+                        cachedPlayerPtr = (IntPtr)mem.Watchers["playerCharacter"].Current;
+                        showingVolumes = false;
+                    }
                 }
                 await Task.Delay(16);
             }
@@ -70,7 +82,6 @@ namespace TOW2Trainer.Logic
 
             if (cheatFlying != ShouldNoclip || ShouldNoclip && (movementMode != 5 || acceleration != 99999f || flySpeed != 2500 * FlySpeedMult))
             {
-                Debug.WriteLine(mem.Watchers["acceleration"].Current);
                 SetNoclip(ShouldNoclip);
             }
         }
@@ -152,6 +163,12 @@ namespace TOW2Trainer.Logic
         private static byte SetBit(byte b, int i, bool v)
         {
             return v ? (byte)(b | 1 << i) : (byte)(b & ~(1 << i));
+        }
+
+        internal void ToggleVolumes()
+        {
+            showingVolumes = !showingVolumes;
+            mem.SetVolumesVisible(showingVolumes);
         }
     }
 }
