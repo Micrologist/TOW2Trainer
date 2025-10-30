@@ -9,9 +9,10 @@ Game trainer for [The Outer Worlds 2](https://https://www.pcgamingwiki.com/wiki/
 - Store and Teleport position
 - Noclip (adjustable fly speed)
 - God Mode
+- Toggle Blocking- & KillVolume visuals
 
 ## Download
-Click [here](https://github.com/Micrologist/TOW2Trainer/releases/latest/download/TOW2Trainer.exe) to download the latest version.
+Click [here](https://github.com/Micrologist/TOW2Trainer/releases/latest/download/TOW2Trainer.1.2.zip) to download the latest version.
 
 ## Requirements
 
