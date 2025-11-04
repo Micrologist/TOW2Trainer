@@ -20,6 +20,15 @@ namespace TOW2Trainer.Logic
         public double YPos { get; private set; }
         public double ZPos { get; private set; }
         public double Vel { get; private set; }
+        public double ZVel { get; private set; }
+
+        public bool IsHooked { get; private set; }
+
+        public bool ConsoleEnabled { get; private set; }
+
+        public string GameVersion { get; private set; }
+
+        public string ExternalModuleName => $"ArkansasVolumeVisualizer-{GameVersion}.dll";
 
         private readonly TOW2Memory mem;
 
@@ -42,7 +51,7 @@ namespace TOW2Trainer.Logic
             {
                 if (mem.UpdateState())
                 {
-                    UpdateUIValues();
+                    UpdateValues();
                     SetGameState();
 
                     if ((IntPtr)mem.Watchers["playerCharacter"].Current != cachedPlayerPtr)
@@ -50,6 +59,12 @@ namespace TOW2Trainer.Logic
                         cachedPlayerPtr = (IntPtr)mem.Watchers["playerCharacter"].Current;
                         showingVolumes = false;
                     }
+                    IsHooked = true;
+                }
+                else
+                {
+                    ConsoleEnabled = false;
+                    IsHooked = false;
                 }
                 await Task.Delay(16);
             }
@@ -86,7 +101,7 @@ namespace TOW2Trainer.Logic
             }
         }
 
-        private void UpdateUIValues()
+        private void UpdateValues()
         {
             XPos = (double)mem.Watchers["xPos"].Current;
             YPos = (double)mem.Watchers["yPos"].Current;
@@ -95,6 +110,11 @@ namespace TOW2Trainer.Logic
             double yVel = (double)mem.Watchers["yVel"].Current;
             double hVel = Math.Floor(Math.Sqrt(xVel * xVel + yVel * yVel) + 0.5f) / 100;
             Vel = (double)hVel;
+
+            ZVel = (double)mem.Watchers["zVel"].Current / 100d;
+
+            var fullVersion = (string)mem.Watchers["gameVersion"].Current;
+            GameVersion = fullVersion[(fullVersion.LastIndexOf('-') + 1)..];
         }
 
         private void StorePosition()
@@ -168,7 +188,12 @@ namespace TOW2Trainer.Logic
         internal void ToggleVolumes()
         {
             showingVolumes = !showingVolumes;
-            mem.SetVolumesVisible(showingVolumes);
+            mem.SetVolumesVisible(ExternalModuleName, showingVolumes);
+        }
+
+        internal void UnlockConsole()
+        {
+            ConsoleEnabled = mem.UnlockConsole(ExternalModuleName);
         }
     }
 }

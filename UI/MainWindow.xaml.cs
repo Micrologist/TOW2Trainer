@@ -38,11 +38,6 @@ namespace TOW2Trainer.UI
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = new TimeSpan(10 * 10000) };
             timer.Tick += UIUpdateTick;
             timer.Start();
-
-            if(!File.Exists("ArkansasVolumeVisualizer.dll"))
-            {
-                toggleVolumesBtn.Visibility = Visibility.Hidden;
-            }
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -177,9 +172,17 @@ namespace TOW2Trainer.UI
                 + (Logic.YPos / 100).ToString("0.00") + "\n"
                 + (Logic.ZPos / 100).ToString("0.00");
             speedBlock.Text = Logic.Vel.ToString("0.00") + " m/s";
+            zSpeedBlock.Text = Logic.ZVel.ToString("0.00") + " m/s";
+
             SetLabel(Logic.ShouldGod, godLabel);
             SetLabel(Logic.ShouldNoclip, noclipLabel);
             flySpeedLabel.Content = Logic.FlySpeedMult.ToString("0.0") + "x";
+
+            toggleVolumesBtn.Visibility = (Logic.IsHooked && File.Exists(Logic.ExternalModuleName)) 
+                ? Visibility.Visible : Visibility.Hidden;
+
+            unlockConsoleBtn.Visibility = (toggleVolumesBtn.Visibility == Visibility.Visible 
+                && !Logic.ConsoleEnabled) ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void SetLabel(bool state, System.Windows.Controls.Label label)
@@ -249,6 +252,17 @@ namespace TOW2Trainer.UI
         {
             this.Topmost = !this.Topmost;
             topmostBtn.Content = this.Topmost ? "don't stay on top" : "stay on top";
+        }
+
+        private void speedLabel_Click(object sender, RoutedEventArgs e)
+        {
+            zSpeedLabel.Visibility = 1 - zSpeedLabel.Visibility;
+            zSpeedBlock.Visibility = zSpeedLabel.Visibility;
+        }
+
+        private void unlockConsoleBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Logic.UnlockConsole();
         }
     }
 }

@@ -60,10 +60,14 @@ namespace TOW2Trainer.Logic
         {
 
             nint localPlayerPtr;
+            nint gameVersionPtr;
+
             try
             {
                 SignatureScanner scanner = new SignatureScanner(proc, proc.MainModule.BaseAddress, proc.MainModule.ModuleMemorySize);
                 localPlayerPtr = GetLocalPlayerPtr();
+                gameVersionPtr = GetGameVersionPtr();
+
                 if (localPlayerPtr == nint.Zero)
                 {
                     return false;
@@ -71,7 +75,7 @@ namespace TOW2Trainer.Logic
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return false;
             }
 
@@ -79,7 +83,6 @@ namespace TOW2Trainer.Logic
             const int OFFSET_CHARACTER = 0x378;
             const int OFFSET_CAPSULE = 0x3C8;
             const int OFFSET_MOVEMENT = 0x3C0;
-            Debug.WriteLine(localPlayerPtr.ToString("X8"));
 
             Watchers = [
                 // LocalPlayer -> PlayerController -> PlayerCharacter -> PlayerCapsule -> Position
@@ -119,6 +122,8 @@ namespace TOW2Trainer.Logic
                 // LocalPlayer -> PlayerController -> ControlRotation
                 new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, 0x3A0)) { Name = "vLook" },
                 new MemoryWatcher<double>(new DeepPointer(localPlayerPtr, OFFSET_CONTROLLER, 0x3A8)) { Name = "hLook" },
+
+                new StringWatcher(gameVersionPtr, 255) { Name = "gameVersion" },
             ];
 
 
@@ -128,12 +133,13 @@ namespace TOW2Trainer.Logic
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return false;
             }
 
             return true;
         }
+
 
         public void Write(string name, byte[] bytes)
         {
@@ -172,13 +178,12 @@ namespace TOW2Trainer.Logic
             Write(name, new byte[] { bValue });
         }
 
-        public void SetVolumesVisible(bool newVisbilityState)
+        public void SetVolumesVisible(string moduleName, bool newVisbilityState)
         {
             if (!IsHooked()) return;
 
             try
             {
-                var moduleName = "ArkansasVolumeVisualizer.dll";
                 var exportThunk = "RefreshVolumes_Thread";
 
                 string dllPath = Path.Combine(
@@ -195,6 +200,33 @@ namespace TOW2Trainer.Logic
                 Console.WriteLine(e.Message);
             }
         }
+        public bool UnlockConsole(string moduleName)
+        {
+            if (!IsHooked()) return true;
+
+            try
+            {
+                var exportThunk = "UnlockConsole_Thread";
+
+                string dllPath = Path.Combine(
+                    AppContext.BaseDirectory,
+                    moduleName);
+
+                Console.WriteLine(dllPath);
+
+                var (hProc, remoteBase) = Remote.EnsureInjected(proc, dllPath, moduleName);
+                var remoteThunk = Remote.GetRemoteExportByRva(remoteBase, dllPath, exportThunk);
+
+                Remote.CallRemoteBool(hProc, remoteThunk, true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+
+            return true;
+        }
 
         private nint GetLocalPlayerPtr()
         {
@@ -206,6 +238,17 @@ namespace TOW2Trainer.Logic
             var localPlayerPtr = new DeepPointer(gameEnginePtr, 0x1178, 0x38).Deref<IntPtr>(proc);
 
             return localPlayerPtr;
+        }
+
+
+        private IntPtr GetGameVersionPtr()
+        {
+            var scn = new SignatureScanner(proc, proc.MainModule.BaseAddress, proc.MainModule.ModuleMemorySize);
+
+            var gameVersionTrg = new SigScanTarget(6, "48 8B 10 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 4D D0 48 85 C9 ") { OnFound = (p, s, ptr) => ptr + 0x4 + proc.ReadValue<int>(ptr) };
+            var gameVersionPtr = scn.Scan(gameVersionTrg);
+
+            return gameVersionPtr;
         }
 
     }

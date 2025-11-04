@@ -1,79 +1,87 @@
 #include <Windows.h>
+#include <fstream>
+#include <string>
+#include <type_traits>
 #include "SDK/Engine_classes.hpp"
+#include "SDK/Arkansas_classes.hpp"
+#include <functional>
 
-static inline void ProcessActor(SDK::AActor* Actor, bool visibilityState)
+static void RefreshVolumes_Impl(bool visible)
 {
-    if (!Actor) return;
-
-    const bool bIsBlocking = Actor->IsA(SDK::ABlockingVolume::StaticClass());
-    const bool bIsKillZ = Actor->IsA(SDK::AKillZVolume::StaticClass());
-    if (!bIsBlocking && !bIsKillZ) return;
-
-    SDK::UBrushComponent* BrushComponent = nullptr;
-
-    if (bIsBlocking)
-    {
-        auto* BV = static_cast<SDK::ABlockingVolume*>(Actor);
-        BV->BrushColor = SDK::FColor(0, 255, 0, 255);   // green
-        BV->bColored = true;
-        BrushComponent = BV->BrushComponent;
-
-        // These are not for blocking us, probably
-        if (BrushComponent && BrushComponent->BodyInstance.ObjectType > SDK::ECollisionChannel::ECC_Pawn)
-            return;
-    }
-    else // KillZ
-    {
-        auto* KV = static_cast<SDK::AKillZVolume*>(Actor);
-        KV->BrushColor = SDK::FColor(0, 0, 255, 255);
-        KV->bColored = true;
-        BrushComponent = KV->BrushComponent;
-    }
-
-    // Unhide actor and brush
-    Actor->SetActorHiddenInGame(!visibilityState);
-
-    if (BrushComponent)
-    {
-        BrushComponent->SetHiddenInGame(!visibilityState, true);
-    }
-}
-
-static inline void ProcessWorld(SDK::UWorld* World, bool visibilityState)
-{
+    auto* World = SDK::UWorld::GetWorld();
     if (!World) return;
 
-    for (SDK::ULevel* Level : World->Levels)
+    SDK::TArray<SDK::AActor*> volumes;
+    SDK::UGameplayStatics::GetAllActorsOfClass(World, SDK::AVolume::StaticClass(), &volumes);
+
+    for (auto* actor : volumes)
     {
-        if (!Level) continue;
-        auto& Actors = Level->Actors;
-        for (SDK::AActor* Actor : Actors)
+        if (!actor) continue;
+
+        const bool isBV = actor->IsA(SDK::ABlockingVolume::StaticClass());
+        const bool isKZ = actor->IsA(SDK::AKillZVolume::StaticClass());
+        if (!isBV && !isKZ) continue;
+
+        SDK::UBrushComponent* brush = nullptr;
+        if (isBV)
         {
-            if (!Actor) continue;
-            ProcessActor(Actor, visibilityState);
+            auto* bv = static_cast<SDK::ABlockingVolume*>(actor);
+            bv->BrushColor = SDK::FColor(0, 255, 0, 255);
+            bv->bColored = true;
+            brush = bv->BrushComponent;
+
+            if (brush && brush->BodyInstance.ObjectType > SDK::ECollisionChannel::ECC_Pawn)
+                continue;
         }
+        else
+        {
+            auto* kz = static_cast<SDK::AKillZVolume*>(actor);
+            kz->BrushColor = SDK::FColor(0, 0, 255, 255);
+            kz->bColored = true;
+            brush = kz->BrushComponent;
+        }
+
+        actor->SetActorHiddenInGame(!visible);
+        if (brush) brush->SetHiddenInGame(!visible, true);
     }
 }
 
-extern "C" __declspec(dllexport) void __stdcall RefreshVolumes(bool visibilityState)
+static void UnlockConsole_Impl()
 {
-    SDK::UWorld* World = SDK::UWorld::GetWorld();
-    if (!World) return;
-    ProcessWorld(World, visibilityState);
+    auto* Engine = SDK::UEngine::GetEngine();
+    if (!Engine || !Engine->GameViewport || !Engine->ConsoleClass)
+        return;
+
+    SDK::UObject* NewConsoleObj =
+        SDK::UGameplayStatics::SpawnObject(Engine->ConsoleClass, Engine->GameViewport);
+    if (NewConsoleObj)
+        Engine->GameViewport->ViewportConsole = static_cast<SDK::UConsole*>(NewConsoleObj);
+
+    if (auto* Settings = SDK::UInputSettings::GetDefaultObj())
+    {
+        const auto insertName = SDK::UKismetStringLibrary::Conv_StringToName(L"Insert");
+        Settings->ConsoleKeys[0].KeyName = insertName;
+    }
 }
 
-// Thread-proc thunk so you can use CreateRemoteThread and pass the bool in WPARAM-style:
-// pass param == IntPtr.Zero => false, anything else => true
 extern "C" __declspec(dllexport) DWORD WINAPI RefreshVolumes_Thread(LPVOID param)
 {
-    RefreshVolumes(param != nullptr);
+    const bool visible = (param != nullptr);
+    RefreshVolumes_Impl(visible);
     return 0;
 }
 
-// Keep DllMain minimal; do NOT run work here. Just disable attach/detach callbacks.
+extern "C" __declspec(dllexport) DWORD WINAPI UnlockConsole_Thread(LPVOID param)
+{
+    UnlockConsole_Impl();
+    return 0;
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID)
 {
     if (reason == DLL_PROCESS_ATTACH)
+    {
         DisableThreadLibraryCalls(hModule);
+    }
     return TRUE;
 }

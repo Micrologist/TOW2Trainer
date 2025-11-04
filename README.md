@@ -1,4 +1,4 @@
-# The Outer Worlds 2 Trainer
+# The Outer Worlds 2 - Speedrun Trainer
 
 Game trainer for [The Outer Worlds 2](https://https://www.pcgamingwiki.com/wiki/The_Outer_Worlds_2)
 
