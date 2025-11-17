@@ -13,7 +13,7 @@ Game trainer for [The Outer Worlds 2](https://https://www.pcgamingwiki.com/wiki/
 - Unlock in-game console (press Insert to open)
 
 ## Download
-Click [here](https://github.com/Micrologist/TOW2Trainer/releases/latest/download/TOW2Trainer.1.3.zip) to download the latest version.
+Click [here](https://github.com/Micrologist/TOW2Trainer/releases/latest/download/TOW2Trainer.zip) to download the latest version.
 
 ## Requirements
 
